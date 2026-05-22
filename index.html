@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#FF8FAB">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Maimero Timer">
-  <meta property="og:title" content="🎀 Maimero Timer">
-  <meta property="og:description" content="まいめろといっしょにがんばろう♪ かわいいタイマーアプリ">
-  <title>🎀 Maimero Timer</title>
+  <meta name="apple-mobile-web-app-title" content="Kiku-chan Timer">
+  <meta property="og:title" content="🌸 Kiku-chan Timer">
+  <meta property="og:description" content="きくちゃんといっしょにがんばろう♪ かわいいタイマーアプリ">
+  <title>🌸 Kiku-chan Timer</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -599,19 +599,19 @@
 <div id="bgDeco"></div>
 
 <div class="overlay" id="overlay">
-  <span class="ov-main-icon">🎀</span>
-  <div class="ov-icons">🎂 ✨ 🎈</div>
+  <span class="ov-main-icon">🌸</span>
+  <div class="ov-icons">🌼 ✨ 🌸</div>
   <div class="ov-title">おつかれさまでした！</div>
   <div class="ov-sub">時間になりました♡<br>よくがんばったね！</div>
-  <button class="ov-btn" id="ovBtn">もどる 🎀</button>
+  <button class="ov-btn" id="ovBtn">もどる 🌸</button>
 </div>
 
 <div class="app">
 
   <header class="header">
-    <span class="header-deco">🎀 🎈 🎀</span>
-    <h1 class="header-title">Maimero <span class="hl">Timer</span></h1>
-    <p class="header-sub">まいめろタイマー</p>
+    <span class="header-deco">🌸 🌼 🌸</span>
+    <h1 class="header-title">Kiku-chan <span class="hl">Timer</span></h1>
+    <p class="header-sub">きくちゃんタイマー</p>
   </header>
 
   <div class="mode-row">
@@ -643,7 +643,7 @@
         <circle class="ring-progress" cx="115" cy="115" r="100" id="ringProg"/>
       </svg>
       <div class="ring-center">
-        <span class="center-emoji" id="cEmoji">🎀</span>
+        <span class="center-emoji" id="cEmoji">🌸</span>
         <div class="center-time"   id="cTime">25:00</div>
         <div class="center-status" id="cStatus">待機中</div>
       </div>
@@ -682,19 +682,19 @@
 
     <div class="controls">
       <button class="btn-circle" id="resetBtn" title="リセット">↺</button>
-      <button class="btn-main"   id="mainBtn">スタート 🎈</button>
+      <button class="btn-main"   id="mainBtn">スタート 🌸</button>
     </div>
 
   </div>
 
   <div class="msg-card">
-    <div class="msg-text" id="msgEl">🍓 まいめろといっしょにがんばろう♪</div>
+    <div class="msg-text" id="msgEl">🌸 きくちゃんといっしょにがんばろう♪</div>
   </div>
 
   <div class="stats">
     <div class="stat-card">
       <div class="stat-num" id="statSessions">0</div>
-      <div class="stat-lbl">🎂 完了セッション</div>
+      <div class="stat-lbl">🌸 完了セッション</div>
     </div>
     <div class="stat-card">
       <div class="stat-num" id="statMinutes">0</div>
@@ -709,24 +709,28 @@
 </div>
 
 <script>
+/* =========================================================
+   Kiku-chan Timer — pure vanilla JS
+   ========================================================= */
+
 const CIRC = 2 * Math.PI * 100;
 
 const MSGS = [
-  '🍓 まいめろといっしょにがんばろう♪',
-  '🎀 ゆっくりでいいよ、一緒にね♡',
-  '🎈 今日もいい日にしよう！',
-  '🍰 おやつを楽しみに集中！',
-  '💕 まいめろはいつも応援してるよ',
-  '🌸 きっとうまくいく！',
+  '🌸 きくちゃんといっしょにがんばろう♪',
+  '🌼 ゆっくりでいいよ、一緒にね♡',
+  '🌸 今日もいい日にしよう！',
+  '🍵 おやつを楽しみに集中！',
+  '💕 きくちゃんはいつも応援してるよ',
+  '✨ きっとうまくいく！',
   '🎵 楽しい時間はあっという間♪',
-  '✨ 一歩一歩、着実に進もう！',
-  '🐨 コアラもおうえんしてるよ！',
-  '🌈 レインボーベアとがんばろう！',
-  '🍪 クッキーを食べながら一休み♡',
-  '🎊 今日もよくがんばってるね！',
+  '🌼 一歩一歩、着実に進もう！',
+  '🌸 きくちゃんがそばにいるよ！',
+  '💫 今日もかわいくがんばろう！',
+  '🍵 一息ついてリフレッシュ♡',
+  '🌸 今日もよくがんばってるね！',
 ];
 
-const EMOJI_IDLE = ['🎀','🌸','🍓','🎈','💕'];
+const EMOJI_IDLE = ['🌸','🌼','💮','🌸','💕'];
 const EMOJI_RUN  = ['⏳','🌟','💫','🎵','✨'];
 
 let mins = 25, secs = 0;
@@ -740,7 +744,7 @@ let sessions = 0, totalMins = 0, streak = 0;
 let msgIdx = 0, emojiIdx = 0;
 
 try {
-  const saved = JSON.parse(localStorage.getItem('maimero_stats') || '{}');
+  const saved = JSON.parse(localStorage.getItem('kikuchan_stats') || '{}');
   sessions  = saved.sessions  || 0;
   totalMins = saved.totalMins || 0;
   streak    = saved.streak    || 0;
@@ -805,7 +809,7 @@ function nextMsg() {
 }
 
 function saveStats() {
-  try { localStorage.setItem('maimero_stats', JSON.stringify({sessions, totalMins, streak})); } catch(e){}
+  try { localStorage.setItem('kikuchan_stats', JSON.stringify({sessions, totalMins, streak})); } catch(e){}
 }
 
 function refreshStats() {
@@ -841,12 +845,12 @@ function startTimer() {
 function pauseTimer() {
   isRunning = false;
   clearInterval(timerId);
-  mainBtn.textContent = 'つづける 🎀';
+  mainBtn.textContent = 'つづける 🌸';
   mainBtn.classList.remove('paused');
   cStatus.textContent = '一時停止中';
   cEmoji.classList.remove('pulse');
   cEmoji.textContent = '⏸';
-  setMsg('🌸 もう少し！一緒にがんばろう♡');
+  setMsg('🌼 もう少し！一緒にがんばろう♡');
 }
 
 function resetTimer() {
@@ -854,7 +858,7 @@ function resetTimer() {
   clearInterval(timerId);
   swSec = 0;
   remainSec = totalSec;
-  mainBtn.textContent = 'スタート 🎈';
+  mainBtn.textContent = 'スタート 🌸';
   mainBtn.classList.remove('paused');
   cStatus.textContent = '待機中';
   cEmoji.classList.remove('pulse');
@@ -871,7 +875,7 @@ function complete() {
   streak++;
   saveStats();
   refreshStats();
-  mainBtn.textContent = 'スタート 🎈';
+  mainBtn.textContent = 'スタート 🌸';
   mainBtn.classList.remove('paused');
   cEmoji.classList.remove('pulse');
   cTime.classList.remove('urgent');
@@ -916,7 +920,7 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
       cTime.textContent = '00:00';
     } else {
       cEmoji.textContent = EMOJI_IDLE[0];
-      mainBtn.textContent = 'スタート 🎈';
+      mainBtn.textContent = 'スタート 🌸';
       updateCountdownDisplay();
     }
   });
@@ -963,7 +967,7 @@ function showOverlay() {
 }
 
 function spawnConfetti(n) {
-  const shapes = ['🎀','🎈','⭐','💕','🌸','✨','🍓','🎊'];
+  const shapes = ['🌸','🌼','⭐','💕','💮','✨','💫','🌸'];
   const colors = ['#FF8FAB','#9DCEFF','#C4A3D4','#FFE066','#98FB98','#FFB7C5'];
   for (let i = 0; i < n; i++) {
     setTimeout(() => {
@@ -1009,7 +1013,7 @@ function vibrate(pattern) {
 
 (function() {
   const deco = document.getElementById('bgDeco');
-  const items = ['🎈','🎀','🌸','✨','💕','🎊','🍓','🌟'];
+  const items = ['🌸','🌼','💮','✨','💕','🌸','💫','🌟'];
   for (let i = 0; i < 14; i++) {
     const el = document.createElement('div');
     el.className = 'float-item';
