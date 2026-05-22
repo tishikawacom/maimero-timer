@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FF8FAB">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Maimero Timer">
+  <meta property="og:title" content="🎀 Maimero Timer">
+  <meta property="og:description" content="まいめろといっしょにがんばろう♪ かわいいタイマーアプリ">
+  <title>🎀 Maimero Timer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --pink:        #FF8FAB;
+      --pink-mid:    #FF6B9D;
+      --pink-light:  #FFD6E0;
+      --pink-pale:   #FFF0F5;
+      --blue:        #9DCEFF;
+      --blue-light:  #DAEEFF;
+      --purple:      #C4A3D4;
+      --purple-dark: #9B6BD4;
+      --purple-light:#EDD6FF;
+      --cream:       #FFF8FC;
+      --text:        #4A3728;
+      --text-soft:   #9B7E75;
+      --white:       #FFFFFF;
+      --radius-pill: 999px;
+      --shadow-card: 0 8px 32px rgba(200,100,150,.13), 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Nunito', 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', sans-serif;
+      background: linear-gradient(155deg, #FFE8F0 0%, #EEF4FF 50%, #F5EEFF 100%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    #bgDeco {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .float-item {
+      position: absolute;
+      animation: floatUp linear infinite;
+      opacity: 0;
+      user-select: none;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(105vh) rotate(-10deg); opacity: 0; }
+      5%   { opacity: .65; }
+      95%  { opacity: .65; }
+      100% { transform: translateY(-80px) rotate(10deg); opacity: 0; }
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 0 16px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      width: 100%;
+      text-align: center;
+      padding: 40px 0 16px;
+    }
+
+    .header-deco {
+      font-size: 24px;
+      letter-spacing: 6px;
+      display: block;
+      margin-bottom: 6px;
+      animation: rockDeco 3.5s ease-in-out infinite;
+    }
+
+    @keyframes rockDeco {
+      0%,100% { transform: rotate(-4deg) scale(1); }
+      50%      { transform: rotate(4deg) scale(1.06); }
+    }
+
+    .header-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: 1px;
+      line-height: 1.1;
+    }
+
+    .header-title .hl {
+      background: linear-gradient(135deg, var(--pink), var(--purple-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-soft);
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
+
+    .timer-card {
+      width: 100%;
+      background: rgba(255,255,255,.90);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 36px;
+      padding: 28px 22px 32px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 14px;
+    }
+
+    .ring-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+
+    .ring-svg {
+      width: 230px;
+      height: 230px;
+      transform: rotate(-90deg);
+      overflow: visible;
+      filter: drop-shadow(0 4px 16px rgba(255,143,171,.25));
+    }
+
+    .ring-track {
+      fill: none;
+      stroke: #FFE0ED;
+      stroke-width: 15;
+    }
+
+    .ring-progress {
+      fill: none;
+      stroke: url(#grad1);
+      stroke-width: 15;
+      stroke-linecap: round;
+      stroke-dasharray: 628.32;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1);
+    }
+
+    .ring-glow {
+      fill: none;
+      stroke: url(#grad1);
+      stroke-width: 22;
+      stroke-linecap: round;
+      stroke-dasharray: 628.32;
+      stroke-dashoffset: 0;
+      opacity: .18;
+      transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1);
+    }
+
+    .ring-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: 170px;
+      pointer-events: none;
+    }
+
+    .center-emoji {
+      font-size: 30px;
+      display: block;
+      margin-bottom: 2px;
+      transition: all .35s ease;
+      line-height: 1;
+    }
+
+    .center-emoji.pulse {
+      animation: emojiPop 1.2s ease-in-out infinite;
+    }
+
+    @keyframes emojiPop {
+      0%,100% { transform: scale(1) rotate(-3deg); }
+      50%      { transform: scale(1.2) rotate(3deg); }
+    }
+
+    .center-time {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -2px;
+      line-height: 1;
+      transition: color .3s;
+    }
+
+    .center-time.urgent {
+      color: var(--pink);
+      animation: urgentFlash .55s ease infinite alternate;
+    }
+
+    @keyframes urgentFlash {
+      from { opacity: 1; }
+      to   { opacity: .55; }
+    }
+
+    .center-status {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-soft);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-soft);
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .presets {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .chip {
+      background: var(--pink-light);
+      border: 2.5px solid transparent;
+      border-radius: var(--radius-pill);
+      padding: 8px 18px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+      white-space: nowrap;
+    }
+
+    .chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 14px rgba(255,143,171,.3);
+    }
+
+    .chip.active {
+      background: linear-gradient(135deg, var(--pink), var(--pink-mid));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 5px 16px rgba(255,143,171,.4);
+    }
+
+    .adjuster {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 26px;
+      transition: opacity .25s;
+    }
+
+    .adjuster.locked {
+      opacity: .4;
+      pointer-events: none;
+    }
+
+    .adj-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .adj-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-soft);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .adj-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .adj-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: var(--blue-light);
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s ease;
+      font-family: inherit;
+      line-height: 1;
+      touch-action: manipulation;
+    }
+
+    .adj-btn:hover  { background: var(--blue); transform: scale(1.12); }
+    .adj-btn:active { transform: scale(.92); }
+
+    .adj-val {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--text);
+      min-width: 66px;
+      text-align: center;
+    }
+
+    .adj-colon {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--pink);
+      padding-top: 18px;
+      line-height: 1;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .btn-circle {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: none;
+      background: var(--purple-light);
+      color: var(--text);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s ease;
+      box-shadow: 0 3px 10px rgba(196,163,212,.25);
+      touch-action: manipulation;
+    }
+
+    .btn-circle:hover { background: var(--purple); color: white; transform: scale(1.07); }
+
+    .btn-main {
+      height: 62px;
+      padding: 0 44px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: linear-gradient(135deg, var(--pink) 0%, var(--pink-mid) 55%, #D060A8 100%);
+      color: white;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: .5px;
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 7px 22px rgba(255,107,157,.42);
+      position: relative;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    .btn-main::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(255,255,255,.18), transparent);
+    }
+
+    .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,107,157,.5); }
+    .btn-main:active { transform: translateY(0); }
+
+    .btn-main.paused {
+      background: linear-gradient(135deg, #FFAA50 0%, #FF7B30 100%);
+      box-shadow: 0 7px 22px rgba(255,123,48,.42);
+    }
+
+    .msg-card {
+      width: 100%;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 22px;
+      padding: 15px 22px;
+      text-align: center;
+      box-shadow: 0 2px 14px rgba(200,150,180,.12);
+      margin-bottom: 14px;
+    }
+
+    .msg-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-soft);
+      transition: opacity .35s ease;
+      line-height: 1.5;
+    }
+
+    .msg-text.fade { opacity: 0; }
+
+    .stats {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 18px;
+      padding: 16px 12px;
+      text-align: center;
+      box-shadow: 0 2px 14px rgba(200,150,180,.1);
+    }
+
+    .stat-num {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-soft);
+      margin-top: 4px;
+      letter-spacing: .5px;
+    }
+
+    .mode-row {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(16px);
+      border: 2.5px solid transparent;
+      border-radius: 16px;
+      padding: 12px 8px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-soft);
+      cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+      line-height: 1.3;
+    }
+
+    .mode-btn .mode-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+    .mode-btn.active {
+      background: rgba(255,255,255,.95);
+      border-color: var(--pink);
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(255,143,171,.22);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: radial-gradient(ellipse at center,
+        rgba(255,220,235,.97) 0%,
+        rgba(220,200,255,.97) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .5s ease;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .ov-main-icon {
+      font-size: 90px;
+      display: block;
+      animation: celebRock .7s ease infinite alternate;
+    }
+
+    @keyframes celebRock {
+      from { transform: rotate(-8deg) scale(.94); }
+      to   { transform: rotate(8deg) scale(1.06); }
+    }
+
+    .ov-icons {
+      font-size: 30px;
+      letter-spacing: 8px;
+      animation: fadeInUp .6s ease .3s both;
+    }
+
+    .ov-title {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--text);
+      text-align: center;
+      animation: fadeInUp .6s ease .4s both;
+    }
+
+    .ov-sub {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-soft);
+      text-align: center;
+      line-height: 1.5;
+      animation: fadeInUp .6s ease .5s both;
+    }
+
+    .ov-btn {
+      margin-top: 20px;
+      background: white;
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 17px 44px;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--pink);
+      cursor: pointer;
+      box-shadow: 0 6px 28px rgba(0,0,0,.12);
+      transition: all .2s ease;
+      animation: fadeInUp .6s ease .7s both;
+    }
+
+    .ov-btn:hover { transform: scale(1.06); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .confetti-piece {
+      position: fixed;
+      pointer-events: none;
+      z-index: 301;
+      animation: cfall linear forwards;
+    }
+
+    @keyframes cfall {
+      0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(600deg) scale(.4); opacity: 0; }
+    }
+
+    @media (max-height: 680px) {
+      .header { padding: 20px 0 12px; }
+      .ring-svg { width: 190px; height: 190px; }
+      .center-time { font-size: 46px; }
+      .timer-card { padding: 20px 18px 24px; }
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="bgDeco"></div>
+
+<div class="overlay" id="overlay">
+  <span class="ov-main-icon">🎀</span>
+  <div class="ov-icons">🎂 ✨ 🎈</div>
+  <div class="ov-title">おつかれさまでした！</div>
+  <div class="ov-sub">時間になりました♡<br>よくがんばったね！</div>
+  <button class="ov-btn" id="ovBtn">もどる 🎀</button>
+</div>
+
+<div class="app">
+
+  <header class="header">
+    <span class="header-deco">🎀 🎈 🎀</span>
+    <h1 class="header-title">Maimero <span class="hl">Timer</span></h1>
+    <p class="header-sub">まいめろタイマー</p>
+  </header>
+
+  <div class="mode-row">
+    <button class="mode-btn active" data-mode="countdown" id="modeCD">
+      <span class="mode-icon">⏳</span>カウントダウン
+    </button>
+    <button class="mode-btn" data-mode="stopwatch" id="modeSW">
+      <span class="mode-icon">⏱</span>ストップウォッチ
+    </button>
+  </div>
+
+  <div class="timer-card">
+
+    <div class="ring-wrap">
+      <svg class="ring-svg" viewBox="0 0 230 230">
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#FF8FAB"/>
+            <stop offset="50%"  stop-color="#C060A8"/>
+            <stop offset="100%" stop-color="#9B6BD4"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <circle class="ring-track"    cx="115" cy="115" r="100"/>
+        <circle class="ring-glow"     cx="115" cy="115" r="100" id="ringGlow"/>
+        <circle class="ring-progress" cx="115" cy="115" r="100" id="ringProg"/>
+      </svg>
+      <div class="ring-center">
+        <span class="center-emoji" id="cEmoji">🎀</span>
+        <div class="center-time"   id="cTime">25:00</div>
+        <div class="center-status" id="cStatus">待機中</div>
+      </div>
+    </div>
+
+    <div id="presetSection">
+      <p class="section-label">クイック設定</p>
+      <div class="presets" id="presetRow">
+        <button class="chip" data-min="5">5分</button>
+        <button class="chip" data-min="10">10分</button>
+        <button class="chip active" data-min="25">25分</button>
+        <button class="chip" data-min="45">45分</button>
+        <button class="chip" data-min="60">60分</button>
+      </div>
+    </div>
+
+    <div class="adjuster" id="adjuster">
+      <div class="adj-unit">
+        <div class="adj-label">分</div>
+        <div class="adj-row">
+          <button class="adj-btn" id="minM">−</button>
+          <div class="adj-val" id="minV">25</div>
+          <button class="adj-btn" id="minP">＋</button>
+        </div>
+      </div>
+      <div class="adj-colon">:</div>
+      <div class="adj-unit">
+        <div class="adj-label">秒</div>
+        <div class="adj-row">
+          <button class="adj-btn" id="secM">−</button>
+          <div class="adj-val" id="secV">00</div>
+          <button class="adj-btn" id="secP">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-circle" id="resetBtn" title="リセット">↺</button>
+      <button class="btn-main"   id="mainBtn">スタート 🎈</button>
+    </div>
+
+  </div>
+
+  <div class="msg-card">
+    <div class="msg-text" id="msgEl">🍓 まいめろといっしょにがんばろう♪</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" id="statSessions">0</div>
+      <div class="stat-lbl">🎂 完了セッション</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statMinutes">0</div>
+      <div class="stat-lbl">⏰ 合計（分）</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statStreak">0</div>
+      <div class="stat-lbl">🔥 連続達成</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CIRC = 2 * Math.PI * 100;
+
+const MSGS = [
+  '🍓 まいめろといっしょにがんばろう♪',
+  '🎀 ゆっくりでいいよ、一緒にね♡',
+  '🎈 今日もいい日にしよう！',
+  '🍰 おやつを楽しみに集中！',
+  '💕 まいめろはいつも応援してるよ',
+  '🌸 きっとうまくいく！',
+  '🎵 楽しい時間はあっという間♪',
+  '✨ 一歩一歩、着実に進もう！',
+  '🐨 コアラもおうえんしてるよ！',
+  '🌈 レインボーベアとがんばろう！',
+  '🍪 クッキーを食べながら一休み♡',
+  '🎊 今日もよくがんばってるね！',
+];
+
+const EMOJI_IDLE = ['🎀','🌸','🍓','🎈','💕'];
+const EMOJI_RUN  = ['⏳','🌟','💫','🎵','✨'];
+
+let mins = 25, secs = 0;
+let totalSec = 25 * 60;
+let remainSec = totalSec;
+let swSec = 0;
+let isRunning = false;
+let mode = 'countdown';
+let timerId = null;
+let sessions = 0, totalMins = 0, streak = 0;
+let msgIdx = 0, emojiIdx = 0;
+
+try {
+  const saved = JSON.parse(localStorage.getItem('maimero_stats') || '{}');
+  sessions  = saved.sessions  || 0;
+  totalMins = saved.totalMins || 0;
+  streak    = saved.streak    || 0;
+} catch(e) {}
+
+const ringProg    = document.getElementById('ringProg');
+const ringGlow    = document.getElementById('ringGlow');
+const cEmoji      = document.getElementById('cEmoji');
+const cTime       = document.getElementById('cTime');
+const cStatus     = document.getElementById('cStatus');
+const mainBtn     = document.getElementById('mainBtn');
+const resetBtn    = document.getElementById('resetBtn');
+const minV        = document.getElementById('minV');
+const secV        = document.getElementById('secV');
+const msgEl       = document.getElementById('msgEl');
+const overlay     = document.getElementById('overlay');
+const ovBtn       = document.getElementById('ovBtn');
+const adjuster    = document.getElementById('adjuster');
+const presetSec   = document.getElementById('presetSection');
+const statSessions= document.getElementById('statSessions');
+const statMinutes = document.getElementById('statMinutes');
+const statStreak  = document.getElementById('statStreak');
+
+ringProg.style.strokeDasharray = CIRC;
+ringGlow.style.strokeDasharray = CIRC;
+ringProg.style.strokeDashoffset = 0;
+ringGlow.style.strokeDashoffset = 0;
+
+const pad2 = n => String(n).padStart(2,'0');
+const fmt  = s => `${pad2(Math.floor(s/60))}:${pad2(s%60)}`;
+
+function setProgress(ratio) {
+  const off = CIRC * (1 - Math.max(0, Math.min(1, ratio)));
+  ringProg.style.strokeDashoffset = off;
+  ringGlow.style.strokeDashoffset = off;
+}
+
+function updateCountdownDisplay() {
+  cTime.textContent = fmt(remainSec);
+  setProgress(totalSec > 0 ? remainSec / totalSec : 0);
+  cTime.classList.toggle('urgent', remainSec <= 10 && isRunning && remainSec > 0);
+}
+
+function updateStopwatchDisplay() {
+  cTime.textContent = fmt(swSec);
+  setProgress((swSec % 60) / 60);
+}
+
+function updateAdjDisplay() {
+  minV.textContent = pad2(mins);
+  secV.textContent = pad2(secs);
+}
+
+function setMsg(text) {
+  msgEl.classList.add('fade');
+  setTimeout(() => { msgEl.textContent = text; msgEl.classList.remove('fade'); }, 280);
+}
+
+function nextMsg() {
+  msgIdx = (msgIdx + 1) % MSGS.length;
+  setMsg(MSGS[msgIdx]);
+}
+
+function saveStats() {
+  try { localStorage.setItem('maimero_stats', JSON.stringify({sessions, totalMins, streak})); } catch(e){}
+}
+
+function refreshStats() {
+  statSessions.textContent = sessions;
+  statMinutes.textContent  = totalMins;
+  statStreak.textContent   = streak;
+}
+
+function startTimer() {
+  if (mode === 'countdown' && remainSec <= 0) return;
+  isRunning = true;
+  mainBtn.textContent = '一時停止 ⏸';
+  mainBtn.classList.add('paused');
+  cStatus.textContent = mode === 'countdown' ? '集中中…' : '計測中…';
+  adjuster.classList.add('locked');
+  emojiIdx = (emojiIdx + 1) % EMOJI_RUN.length;
+  cEmoji.textContent = EMOJI_RUN[emojiIdx];
+  cEmoji.classList.add('pulse');
+  nextMsg();
+  timerId = setInterval(() => {
+    if (mode === 'countdown') {
+      remainSec--;
+      updateCountdownDisplay();
+      if (remainSec <= 5 && remainSec > 0) vibrate(40);
+      if (remainSec <= 0) { clearInterval(timerId); isRunning = false; complete(); }
+    } else {
+      swSec++;
+      updateStopwatchDisplay();
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  isRunning = false;
+  clearInterval(timerId);
+  mainBtn.textContent = 'つづける 🎀';
+  mainBtn.classList.remove('paused');
+  cStatus.textContent = '一時停止中';
+  cEmoji.classList.remove('pulse');
+  cEmoji.textContent = '⏸';
+  setMsg('🌸 もう少し！一緒にがんばろう♡');
+}
+
+function resetTimer() {
+  isRunning = false;
+  clearInterval(timerId);
+  swSec = 0;
+  remainSec = totalSec;
+  mainBtn.textContent = 'スタート 🎈';
+  mainBtn.classList.remove('paused');
+  cStatus.textContent = '待機中';
+  cEmoji.classList.remove('pulse');
+  cEmoji.textContent = EMOJI_IDLE[0];
+  adjuster.classList.remove('locked');
+  cTime.classList.remove('urgent');
+  setMsg(MSGS[0]);
+  mode === 'countdown' ? updateCountdownDisplay() : updateStopwatchDisplay();
+}
+
+function complete() {
+  sessions++;
+  totalMins += Math.round(totalSec / 60);
+  streak++;
+  saveStats();
+  refreshStats();
+  mainBtn.textContent = 'スタート 🎈';
+  mainBtn.classList.remove('paused');
+  cEmoji.classList.remove('pulse');
+  cTime.classList.remove('urgent');
+  adjuster.classList.remove('locked');
+  playMelody();
+  vibrate([200, 80, 200, 80, 400]);
+  showOverlay();
+}
+
+mainBtn.addEventListener('click', () => isRunning ? pauseTimer() : startTimer());
+resetBtn.addEventListener('click', resetTimer);
+ovBtn.addEventListener('click', () => { overlay.classList.remove('show'); resetTimer(); });
+
+document.getElementById('presetRow').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip || isRunning) return;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  mins = parseInt(chip.dataset.min);
+  secs = 0;
+  totalSec = mins * 60;
+  remainSec = totalSec;
+  updateCountdownDisplay();
+  updateAdjDisplay();
+});
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (isRunning) return;
+    mode = btn.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const isSW = mode === 'stopwatch';
+    presetSec.style.display = isSW ? 'none' : '';
+    adjuster.style.display  = isSW ? 'none' : '';
+    if (isSW) {
+      swSec = 0;
+      cEmoji.textContent = '⏱';
+      cStatus.textContent = '待機中';
+      mainBtn.textContent = 'スタート ⏱';
+      setProgress(0);
+      cTime.textContent = '00:00';
+    } else {
+      cEmoji.textContent = EMOJI_IDLE[0];
+      mainBtn.textContent = 'スタート 🎈';
+      updateCountdownDisplay();
+    }
+  });
+});
+
+function adjChange(type, delta) {
+  if (isRunning) return;
+  if (type === 'min') mins = Math.max(0, Math.min(99, mins + delta));
+  else secs = ((secs + delta) + 60) % 60;
+  totalSec = mins * 60 + secs;
+  remainSec = totalSec;
+  updateCountdownDisplay();
+  updateAdjDisplay();
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+}
+
+document.getElementById('minP').addEventListener('click', () => adjChange('min', 1));
+document.getElementById('minM').addEventListener('click', () => adjChange('min', -1));
+document.getElementById('secP').addEventListener('click', () => adjChange('sec', 5));
+document.getElementById('secM').addEventListener('click', () => adjChange('sec', -5));
+
+function withAccel(btn, fn) {
+  let tid, interval = 300;
+  const down = () => {
+    fn();
+    tid = setTimeout(function loop() {
+      fn();
+      interval = Math.max(70, interval - 20);
+      tid = setTimeout(loop, interval);
+    }, 550);
+  };
+  const up = () => { clearTimeout(tid); interval = 300; };
+  btn.addEventListener('pointerdown', down);
+  ['pointerup','pointerleave','pointercancel'].forEach(e => btn.addEventListener(e, up));
+}
+withAccel(document.getElementById('minP'), () => adjChange('min',  1));
+withAccel(document.getElementById('minM'), () => adjChange('min', -1));
+withAccel(document.getElementById('secP'), () => adjChange('sec',  5));
+withAccel(document.getElementById('secM'), () => adjChange('sec', -5));
+
+function showOverlay() {
+  overlay.classList.add('show');
+  spawnConfetti(70);
+}
+
+function spawnConfetti(n) {
+  const shapes = ['🎀','🎈','⭐','💕','🌸','✨','🍓','🎊'];
+  const colors = ['#FF8FAB','#9DCEFF','#C4A3D4','#FFE066','#98FB98','#FFB7C5'];
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      if (Math.random() > .45) {
+        el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+        el.style.fontSize = (Math.random() * 14 + 12) + 'px';
+      } else {
+        const sz = (Math.random() * 10 + 6) + 'px';
+        el.style.width  = sz; el.style.height = sz;
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.borderRadius = Math.random() > .4 ? '50%' : '3px';
+      }
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (Math.random() * 2.5 + 1.8) + 's';
+      el.style.animationDelay   = (Math.random() * .8) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }, i * 25);
+  }
+}
+
+function playMelody() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[523.25,0],[659.25,.16],[783.99,.32],[1046.5,.48],[783.99,.7],[1046.5,.86],[1318.5,1.05]].forEach(([f,t]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = f; osc.type = 'sine';
+      const s = ctx.currentTime + t;
+      gain.gain.setValueAtTime(.22, s);
+      gain.gain.exponentialRampToValueAtTime(.001, s + .38);
+      osc.start(s); osc.stop(s + .4);
+    });
+  } catch(e){}
+}
+
+function vibrate(pattern) {
+  try { navigator.vibrate && navigator.vibrate(pattern); } catch(e){}
+}
+
+(function() {
+  const deco = document.getElementById('bgDeco');
+  const items = ['🎈','🎀','🌸','✨','💕','🎊','🍓','🌟'];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('div');
+    el.className = 'float-item';
+    el.textContent = items[Math.floor(Math.random() * items.length)];
+    el.style.fontSize = (Math.random() * 18 + 16) + 'px';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.animationDuration = (Math.random() * 14 + 10) + 's';
+    el.style.animationDelay   = (Math.random() * 14) + 's';
+    deco.appendChild(el);
+  }
+})();
+
+refreshStats();
+updateCountdownDisplay();
+updateAdjDisplay();
+</script>
+</body>
+</html>
